@@ -47,6 +47,7 @@ public class HealthManager : MonoBehaviour
 
         healthSlider.value = health / MAXHEALTH;
         mylife.text = health.ToString("00");
+        GetComponent<AudioSource>().Play();
 
 
     }
