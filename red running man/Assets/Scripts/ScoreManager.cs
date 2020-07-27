@@ -12,22 +12,18 @@ public class ScoreManager : MonoBehaviour
 
    void OnTriggerEnter2D(Collider2D col)
     {
-        score++;
-        Destroy(col.gameObject);
-        scoretxt.text = score.ToString();
-        PlayerPrefs.SetInt("savedscore", score);
-        if(score > PlayerPrefs.GetInt("Highscore"))
+        if (col.gameObject.CompareTag("coin"))
         {
-            PlayerPrefs.SetInt("Highscore", score);
+            score++;
+            Destroy(col.gameObject);
+            scoretxt.text = score.ToString();
+            PlayerPrefs.SetInt("savedscore", score);
+            if(score > PlayerPrefs.GetInt("Highscore"))
+            {
+                PlayerPrefs.SetInt("Highscore", score);
+            }
         }
-    }
-
-    private void Update()
-    {
-       
 
     }
-
-
 
 }
