@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.U2D;
 using UnityEngine;
 
 
@@ -9,15 +10,25 @@ public class CharacterControl2D : MonoBehaviour
     public Collider2D groundCheck;
     public LayerMask groundLayer;
     public float speed;
+    public float maxSpeed;
+    public float currentSpeed;
     public float smooth;
     public float jumpForce;
     Rigidbody2D rb2D;
     private Animator animator;
     private float x;
 
+    public int extraJumps;
+    public int maxExtraJumps;
+
     // Start is called before the first frame update
     void Start()
     {
+        extraJumps = maxExtraJumps;
+
+        maxSpeed = speed * 2;
+        currentSpeed = speed;
+
         rb2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
@@ -27,7 +38,17 @@ public class CharacterControl2D : MonoBehaviour
     void FixedUpdate()
     {
          x = Input.GetAxisRaw("Horizontal");
-        Vector2 targetVelocity = new Vector2(x * speed, rb2D.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            currentSpeed = maxSpeed;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            currentSpeed =speed;
+        }
+
+        Vector2 targetVelocity = new Vector2(x * currentSpeed, rb2D.velocity.y);
         rb2D.velocity = Vector2.SmoothDamp(rb2D.velocity, targetVelocity,
             ref targetVelocity, Time.deltaTime * smooth);
 
@@ -60,11 +81,24 @@ public class CharacterControl2D : MonoBehaviour
        
         grounded = groundCheck.IsTouchingLayers(groundLayer);
 
+        if (grounded)
+        {
+            extraJumps = maxExtraJumps;
+        }
+
         animator.SetBool("Jumping", !grounded);
         animator.SetBool("Running", x != 0);
 
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
+        {
             rb2D.AddForce(new Vector2(0f, jumpForce));
+        }
+        else if(Input.GetKeyDown(KeyCode.Space) && extraJumps >0)
+        {
+            rb2D.AddForce(new Vector2(0f, jumpForce));
+            extraJumps--;
+
+        }
     }
 
 
